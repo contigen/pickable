@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  businessName String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+businessDataset BusinessDataset[]
+}
+
+model BusinessDataset {
+  id          String @id @default(cuid())
+  userId String
+  name        String
+  uploadedAt  DateTime @default(now())  
+  data String @db.Text
+  records     BusinessRecord[]
+  user User @relation(fields: [userId], references: [id])
+  sliceTypes String @db.Text
+}
+
+model BusinessRecord {
+  id        String   @id @default(cuid())
+  datasetId String
+  content   String @db.Text
+  timeframe String?
+  metadata  Json
+createdAt DateTime @default(now())
+  dataset   BusinessDataset @relation(fields: [datasetId], references: [id])
+  embedding BusinessEmbedding?
+
+  @@index([datasetId]) 
+  @@index([timeframe])
+}
+
+model BusinessEmbedding {
+  id        String   @id @default(cuid())
+  recordId  String   @unique  
+  // doesn't work via Prisma migration, use raw SQL instead
+  vector    Unsupported("VECTOR(1024)")  
+  record    BusinessRecord @relation(fields: [recordId], references: [id])
+}
