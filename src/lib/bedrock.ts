@@ -254,7 +254,6 @@ export async function invokeAgent<T extends keyof typeof ActionSchemas>(
       typeof inputText === 'object' &&
       (inputText.action === 'generateUI' || inputText.action === 'repairUI')
 
-    // Get action-specific system prompt
     const getSystemPrompt = () => {
       if (typeof inputText === 'object') {
         const action = inputText.action
